@@ -1,0 +1,19 @@
+{
+    "server": {
+        "port": 3000,
+        "api": {
+            "version": "v1"
+        }
+    },
+    "datasource": {
+        "type": "sqlite",
+        "database": "../db/test.db"
+    },
+    "auth": {
+        "pepper": "3ed5e0c6ae22be76124b7a437ea374191d3608a0",
+        "token": {
+            "secret": "be02fd3e235637e0b32fd8bb5e2286454e09a80a900e37dcea06fe7de9cd4513",
+            "expire": 2592000
+        }
+    }
+}

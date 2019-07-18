@@ -1,0 +1,551 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Api documentation",
+    "description": "",
+    "termsOfService": ""
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Token User": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "x-token",
+      "description": "Token para usuarios tipo USER o ADMIN"
+    },
+    "Token Admin": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "x-token",
+      "description": "Token para usuarios tipo ADMIN"
+    }
+  },
+  "tags": [
+    {
+      "name": "AuthCtrl"
+    },
+    {
+      "name": "RestCtrl"
+    },
+    {
+      "name": "UsersCtrl"
+    }
+  ],
+  "paths": {
+    "/api/v1/auth/authenticate": {
+      "post": {
+        "operationId": "AuthCtrl.authenticate",
+        "tags": [
+          "AuthCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/AuthCtrlAuthenticatePayload"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Éxito"
+          },
+          "400": {
+            "description": "\"Faltan parametros\". Usuario y/o contraseña no presentes en la petición"
+          },
+          "401": {
+            "description": "\"Credenciales incorrectas\". Las credenciales proporcionadas no pertenecen a un usuario registrado en la base de datos"
+          }
+        },
+        "description": "Obtención de x-token",
+        "summary": "Autenticación de usuarios"
+      }
+    },
+    "/api/v1/rest/{resource}": {
+      "get": {
+        "operationId": "RestCtrl.getAll",
+        "tags": [
+          "RestCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource",
+            "type": "string",
+            "required": true,
+            "description": "Recurso solicitado"
+          },
+          {
+            "description": "Número de página",
+            "in": "query",
+            "name": "p",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "description": "Número de elementos por página",
+            "in": "query",
+            "name": "pp",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "description": "Condiciones de ordenación. <strong>Ejemplo:</strong> <em>[field1:asc][field2:desc]</em>. <strong>RegExp:</strong> <em>(\\[.*?:(asc|desc)\\])</em>",
+            "in": "query",
+            "name": "orders",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Condiciones de filtrado. <strong>Ejemplo:</strong> <em>[field1:eq:1][field2:like:%un+ejemplo%]</em>. <strong>RegExp:</strong> <em>(\\[.*?:(eq|lt|gt|lte|gte|like):.*?\\])</em>",
+            "in": "query",
+            "name": "filters",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Éxito"
+          },
+          "400": {
+            "description": "\"Recurso no encontrado\" No se encuentra el tipo de recurso"
+          },
+          "404": {
+            "description": "<ul><li>\"Formato del filtro incorrecto\"</li><li>\"Formato de la ordenación incorrecto\"</li><li>\"No se encuentra la columna {field-name}\"</li><ul>"
+          }
+        },
+        "security": [
+          {
+            "Token User": []
+          }
+        ],
+        "description": "Los recursos pueden ser paginados, ordenados y filtrados",
+        "summary": "Obtener recursos"
+      },
+      "post": {
+        "operationId": "RestCtrl.create",
+        "tags": [
+          "RestCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource",
+            "type": "string",
+            "required": true,
+            "description": "Recurso solicitado"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Éxito"
+          },
+          "400": {
+            "description": "\"No se han encontrado datos para crear el recurso\""
+          },
+          "404": {
+            "description": "\"Recurso no encontrado\" No se encuentra el tipo de recurso"
+          }
+        },
+        "security": [
+          {
+            "Token User": []
+          }
+        ],
+        "description": "El cuerpo de la petición se compondrá con la estructura del recurso a insertar",
+        "summary": "Crear un nuevo recurso"
+      }
+    },
+    "/api/v1/rest/{resource}/{key}": {
+      "get": {
+        "operationId": "RestCtrl.getOne",
+        "tags": [
+          "RestCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource",
+            "type": "string",
+            "required": true,
+            "description": "Recurso solicitado"
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "type": "object",
+            "required": true,
+            "description": "Clave primaria del recurso solicitado"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Éxito"
+          },
+          "404": {
+            "description": "\"Recurso no encontrado\" Puede ser debido a que el tipo de recurso (:resource) no sea válido o porque no exista un recurso de ese tipo con el identificador solicitado"
+          }
+        },
+        "security": [
+          {
+            "Token User": []
+          }
+        ],
+        "description": "El recurso se identifica por su clave primaria",
+        "summary": "Obtener un recurso"
+      },
+      "put": {
+        "operationId": "RestCtrl.edit",
+        "tags": [
+          "RestCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource",
+            "type": "string",
+            "required": true,
+            "description": "Recurso solicitado"
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "type": "object",
+            "required": true,
+            "description": "Clave primaria del recurso solicitado"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Éxito"
+          },
+          "400": {
+            "description": "\"No se han encontrado datos para actualizar el recurso\""
+          },
+          "404": {
+            "description": "\"Recurso no encontrado\" No se encuentra el tipo de recurso o el recurso con el id solicitado)"
+          }
+        },
+        "security": [
+          {
+            "Token User": []
+          }
+        ],
+        "description": "El recurso se identifica por su clave primaria",
+        "summary": "Editar un recurso existente"
+      },
+      "delete": {
+        "operationId": "RestCtrl.delete",
+        "tags": [
+          "RestCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource",
+            "type": "string",
+            "required": true,
+            "description": "Recurso solicitado"
+          },
+          {
+            "in": "path",
+            "name": "key",
+            "type": "object",
+            "required": true,
+            "description": "Clave primaria del recurso solicitado"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Éxito"
+          },
+          "400": {
+            "description": "\"No se han encontrado datos para actualizar el recurso\""
+          },
+          "404": {
+            "description": "\"Recurso no encontrado\"  No se encuentra el tipo de recurso"
+          }
+        },
+        "security": [
+          {
+            "Token User": []
+          }
+        ],
+        "description": "El recurso se identifica por su clave primaria",
+        "summary": "Eliminar un recurso existente"
+      }
+    },
+    "/api/v1/user": {
+      "get": {
+        "operationId": "UsersCtrl.getAll",
+        "tags": [
+          "UsersCtrl"
+        ],
+        "parameters": [
+          {
+            "description": "Número de página",
+            "in": "query",
+            "name": "p",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "description": "Número de elementos por página",
+            "in": "query",
+            "name": "pp",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "description": "Condiciones de ordenación. <strong>Ejemplo:</strong> <em>[field1:asc][field2:desc]</em>. <strong>RegExp:</strong> <em>(\\[.*?:(asc|desc)\\])</em>",
+            "in": "query",
+            "name": "orders",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Condiciones de filtrado. <strong>Ejemplo:</strong> <em>[field1:eq:1][field2:like:%un+ejemplo%]</em>. <strong>RegExp:</strong> <em>(\\[.*?:(eq|lt|gt|lte|gte|like):.*?\\])</em>",
+            "in": "query",
+            "name": "filters",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Éxito"
+          }
+        },
+        "security": [
+          {
+            "Token User": []
+          }
+        ],
+        "description": "Éxito",
+        "summary": "Obtención de todos los usuarios"
+      },
+      "post": {
+        "operationId": "UsersCtrl.insert",
+        "tags": [
+          "UsersCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/UsersCtrlInsertPayload"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/user/{id}": {
+      "get": {
+        "operationId": "UsersCtrl.getById",
+        "tags": [
+          "UsersCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "number",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "UsersCtrl.put",
+        "tags": [
+          "UsersCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "x-token-decoded",
+            "required": false,
+            "type": "object"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/UsersCtrlPutPayload"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "UsersCtrl.delete",
+        "tags": [
+          "UsersCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "x-token-decoded",
+            "required": false,
+            "type": "object"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/user/{id}/password": {
+      "put": {
+        "operationId": "UsersCtrl.editPassword",
+        "tags": [
+          "UsersCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/UsersCtrlEditPasswordPayload"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AuthCtrlAuthenticatePayload": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "Object": {
+      "type": "object",
+      "properties": {}
+    },
+    "UsersCtrlInsertPayload": {
+      "type": "object",
+      "properties": {
+        "nombre": {
+          "type": "string"
+        },
+        "apellidos": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "rol": {
+          "type": "string"
+        }
+      }
+    },
+    "UsersCtrlPutPayload": {
+      "type": "object",
+      "properties": {
+        "nombre": {
+          "type": "string"
+        },
+        "apellidos": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "rol": {
+          "type": "string"
+        }
+      }
+    },
+    "UsersCtrlEditPasswordPayload": {
+      "type": "object",
+      "properties": {
+        "oldPassword": {
+          "type": "string"
+        },
+        "newPassword": {
+          "type": "string"
+        },
+        "newPasswordRepeat": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

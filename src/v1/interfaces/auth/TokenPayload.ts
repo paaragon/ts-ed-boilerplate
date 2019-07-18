@@ -1,0 +1,1 @@
+export interface TokenPayload { nombre: string; apellidos: string; username: string; rol: string; id: number; }

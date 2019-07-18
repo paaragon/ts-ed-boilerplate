@@ -1,0 +1,1 @@
+export interface AuthResponse { rol: string; username: string; id: number; token: string; }

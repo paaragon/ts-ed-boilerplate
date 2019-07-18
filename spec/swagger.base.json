@@ -1,0 +1,16 @@
+{
+  "securityDefinitions": {
+    "Token User": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "x-token",
+      "description": "Token para usuarios tipo USER o ADMIN"
+    },
+    "Token Admin": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "x-token",
+      "description": "Token para usuarios tipo ADMIN"
+    }
+  }
+}

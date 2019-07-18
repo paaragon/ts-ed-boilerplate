@@ -1,0 +1,1 @@
+export default interface Order { name: string; direction: 'asc' | 'desc'; }
